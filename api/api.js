@@ -11,6 +11,7 @@ const url = "https://www.newyorker.com/cartoons/random";
     defaultViewport: null,
     args: [
       "--no-sandbox",
+      "--incognito",
       "--start-maximized", // Start in maximized state
     ],
   });
