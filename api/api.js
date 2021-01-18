@@ -31,7 +31,7 @@ const url = "https://www.newyorker.com/cartoons/random";
     const doodlename = uuid.v4();
     const location = `./assets/${doodlename}.png`;
     await doodle.screenshot({
-      path: path.join(__dirname, `${location}`),
+      path: `${location}`,
       omitBackground: true,
     });
     await browser.close();
