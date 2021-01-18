@@ -1,4 +1,7 @@
 const puppeteer = require("puppeteer");
+const fs = require("fs");
+const uuid = require("uuid");
+const path = require("path");
 
 const url = "https://www.newyorker.com/cartoons/random";
 
@@ -11,17 +14,28 @@ const url = "https://www.newyorker.com/cartoons/random";
       "--start-maximized", // Start in maximized state
     ],
   });
-  const page = await browser.newPage();
+  try {
+    const page = await browser.newPage();
 
-  await page.goto(url, {
-    waitUntil: "networkidle2",
-  });
+    await page.goto(url, {
+      waitUntil: "networkidle2",
+    });
 
-  await page.click("body");
+    await page.click("body");
 
-  await page.waitForTimeout(10000);
+    await page.waitForTimeout(10000);
 
-  const doodle = await page.$("#cartoon");
-  await doodle.screenshot({ path: "doodle.png", omitBackground: true });
-  await browser.close();
+    const doodle = await page.$("#cartoon");
+    const img = await page.$("#cartoonimg");
+
+    const doodlename = uuid.v4();
+    const location = `./assets/${doodlename}.png`;
+    await doodle.screenshot({
+      path: path.join(__dirname, `${location}`),
+      omitBackground: true,
+    });
+    await browser.close();
+  } catch (error) {
+    console.log(error);
+  }
 })();
