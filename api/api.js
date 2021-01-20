@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const { json } = require("express");
+const { CronJob } = require("cron");
+
 const url = "https://www.newyorker.com/cartoons/random";
 
 const server = express();
@@ -15,13 +17,16 @@ server.use(
   })
 );
 
-server.get("/", (req, res) => {
-  const imgs = scraper();
-  if (img) {
-    res.status(200).json({ something });
-  } else {
-    res.status(500).error("Something");
-  }
+const fetchDoodles = new CronJob("* * * * *", async () => {
+  console.log("Fetching new Remote Jobs...");
+  await scraper.run();
+});
+//You need to explicity start the cronjob
+fetchDoodles.start();
+
+server.get("/api", (req, res) => {
+  console.log("heyyyyy");
+  res.send({ hey: "yo" });
 });
 
 function scraper() {
