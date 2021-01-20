@@ -3,7 +3,7 @@ const uuid = require("uuid");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-const { json } = require('express');
+const { json } = require("express");
 const url = "https://www.newyorker.com/cartoons/random";
 
 const server = express();
@@ -15,14 +15,14 @@ server.use(
   })
 );
 
-server.get('/', (req, res) => {
+server.get("/", (req, res) => {
   const imgs = scraper();
-  if (img){
-    res.status(200>json({something})
+  if (img) {
+    res.status(200).json({ something });
   } else {
-    res.status(500).error("Something")
+    res.status(500).error("Something");
   }
-})
+});
 
 function scraper() {
   (async () => {
@@ -73,4 +73,4 @@ function scraper() {
   })();
 }
 
-module.exports = scraper;
+module.exports = server;
