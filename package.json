@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -19,8 +20,10 @@
   "homepage": "https://github.com/davidgoldcode/be-slackdoodle#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.5",
+    "cors": "^2.8.5",
+    "cron": "^1.8.2",
     "express": "^4.17.1",
-    "helmet": "^4.4.0",
+    "helmet": "^4.4.1",
     "node-image-downloader": "^1.0.7",
     "puppeteer": "^5.5.0",
     "request": "^2.88.2",
