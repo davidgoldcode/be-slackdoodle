@@ -22,8 +22,7 @@ server.get("/api", (req, res) => {
   res.send({ hey: "yo" });
 });
 
-schedule.scheduleJob("30 * * * *", function () {
-  console.log("scheduler is working");
+schedule.scheduleJob("30 * * * * *", function () {
   scraper();
 });
 
