@@ -3,12 +3,12 @@ const uuid = require("uuid");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-const { json } = require("express");
-const { CronJob } = require("cron");
+const schedule = require("node-schedule");
 
 const url = "https://www.newyorker.com/cartoons/random";
 
 const server = express();
+
 server.use(
   cors({
     origin: "*",
@@ -17,16 +17,14 @@ server.use(
   })
 );
 
-const fetchDoodles = new CronJob("* * * * *", async () => {
-  console.log("Fetching new Remote Jobs...");
-  await scraper.run();
-});
-//You need to explicity start the cronjob
-fetchDoodles.start();
-
 server.get("/api", (req, res) => {
   console.log("heyyyyy");
   res.send({ hey: "yo" });
+});
+
+schedule.scheduleJob("30 * * * *", function () {
+  console.log("scheduler is working");
+  scraper();
 });
 
 function scraper() {
@@ -55,7 +53,7 @@ function scraper() {
       const img = await page.$("#cartoonimg");
 
       const doodle1name = uuid.v4();
-      const location = `../assets/${doodle1name}.png`;
+      const location = `./assets/${doodle1name}.png`;
       await doodle1.screenshot({
         path: `${location}`,
         omitBackground: true,
@@ -64,7 +62,7 @@ function scraper() {
       await page.click("#new-cartoon");
       const doodle2 = await page.$("#cartoon");
       const doodle2name = uuid.v4();
-      const location2 = `../assets/2${doodle2name}.png`;
+      const location2 = `./assets/2${doodle2name}.png`;
       await page.waitForTimeout(1000);
       await doodle2.screenshot({
         path: `${location2}`,
