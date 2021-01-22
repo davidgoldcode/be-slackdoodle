@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const schedule = require("node-schedule");
-const cloudinary = require("cloudinary").v2;
+const cloudinary = require("cloudinary");
 require("dotenv").config();
 
 cloudinary.config({
@@ -34,17 +34,22 @@ const server = express();
 //   scraper();
 // });
 
-function uploadScreenshot(screenshot) {
-  return new Promise((resolve, reject) => {
-    const uploadOptions = {};
-    cloudinary.uploader
-      .upload_stream(uploadOptions, (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      })
-      .end(screenshot);
+function uploadScreenshot(path) {
+  // return new Promise((resolve, reject) => {
+  const uploadOptions = {};
+
+  const uploadPreset = {
+    tags: "my_favorite_pizza",
+  };
+  cloudinary.v2.uploader.upload(path, uploadPreset, function (err, image) {
+    if (err) {
+      console.warn(err);
+    } else {
+      console.log("not err");
+    }
   });
 }
+// }
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -67,33 +72,18 @@ function uploadScreenshot(screenshot) {
 
     await page.waitForTimeout(10000);
 
-    const doodle1 = await page.$("#cartoon.vertical-center");
+    const doodle = await page.$("#cartoon.vertical-center");
     const img = await page.$("#cartoonimg");
 
-    const doodle1name = uuid.v4();
-
-    // const cloudinaryOptions = {
-    //   public_id: `toons/${doodle1name}`,
-    // };
-
-    const location = `${doodle1name}.png`;
-    const screenshot = await doodle1.screenshot({
-      encoding: "binary",
+    const doodleName = uuid.v4();
+    const location = `./assets/${doodleName}.png`;
+    const screenshot = await doodle.screenshot({
+      path: location,
       omitBackground: true,
     });
 
-    // await page.click("#new-cartoon");
-    // const doodle2 = await page.$("#cartoon");
-    // const doodle2name = uuid.v4();
-    // const location2 = `./assets/2${doodle2name}.png`;
-    // await page.waitForTimeout(1000);
-    // await doodle2.screenshot({
-    //   path: `${location2}`,
-    //   omitBackground: true,
-    // });
-
-    if (screenshot) {
-      return uploadScreenshot(screenshot);
+    if (location) {
+      return uploadScreenshot(location);
     }
   } catch (error) {
     console.log(error);
