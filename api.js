@@ -45,7 +45,7 @@ function uploadScreenshot(path) {
     if (err) {
       console.warn(err);
     } else {
-      console.log("not err");
+      console.log(image);
     }
   });
 }
