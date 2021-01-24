@@ -1,9 +1,4 @@
 const puppeteer = require("puppeteer");
-const uuid = require("uuid");
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const schedule = require("node-schedule");
 const cloudinary = require("cloudinary");
 require("dotenv").config();
 
@@ -14,25 +9,6 @@ cloudinary.config({
 });
 
 const url = "https://www.newyorker.com/cartoons/random";
-
-const server = express();
-
-// server.use(
-//   cors({
-//     origin: "*",
-//     methods: "GET",
-//     allowedHeaders: "Content-Type",
-//   })
-// );
-
-// server.get("/api", (req, res) => {
-//   console.log("heyyyyy");
-//   res.send({ hey: "yo" });
-// });
-
-// schedule.scheduleJob("23 * * *", function () {
-//   scraper();
-// });
 
 function uploadScreenshot(path) {
   const b64 = `data:image/png;base64,${path}`;
@@ -51,7 +27,7 @@ function uploadScreenshot(path) {
   });
 }
 
-(async () => {
+const cartoonScraper = async () => {
   const browser = await puppeteer.launch({
     headless: true, // Set to false while development
     defaultViewport: null,
@@ -63,20 +39,13 @@ function uploadScreenshot(path) {
   });
   try {
     const page = await browser.newPage();
-
     await page.goto(url, {
       waitUntil: "networkidle2",
     });
-
     await page.click("body");
-
     await page.waitForTimeout(10000);
 
     const doodle = await page.$("#cartoon.vertical-center");
-    const img = await page.$("#cartoonimg");
-
-    const doodleName = uuid.v4();
-    const location = `./assets/${doodleName}.png`;
     const screenshot = await doodle.screenshot({
       encoding: "base64",
       omitBackground: true,
@@ -90,6 +59,8 @@ function uploadScreenshot(path) {
   }
 
   await browser.close();
-})();
+};
 
-module.exports = server;
+cartoonScraper();
+
+module.exports = cartoonScraper;
