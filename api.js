@@ -1,6 +1,9 @@
 const puppeteer = require("puppeteer");
 const cloudinary = require("cloudinary");
+const express = require("express");
 require("dotenv").config();
+
+const server = express();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,7 +13,7 @@ cloudinary.config({
 
 const url = "https://www.newyorker.com/cartoons/random";
 
-function uploadScreenshot(path) {
+const uploadScreenshot = (path) => {
   const b64 = `data:image/png;base64,${path}`;
 
   const uploadPreset = {
@@ -18,14 +21,20 @@ function uploadScreenshot(path) {
     folder: "doodles",
   };
 
-  cloudinary.v2.uploader.upload(b64, uploadPreset, function (err, image) {
-    if (err) {
-      console.warn(err);
-    } else {
-      console.log(image);
+  const response = cloudinary.v2.uploader.upload(
+    b64,
+    uploadPreset,
+    function (err, image) {
+      if (err) {
+        console.warn(err);
+      } else {
+        console.log(image);
+      }
     }
-  });
-}
+  );
+
+  return response;
+};
 
 const cartoonScraper = async () => {
   const browser = await puppeteer.launch({
@@ -61,6 +70,8 @@ const cartoonScraper = async () => {
   await browser.close();
 };
 
-cartoonScraper();
+server.get("/api", (req, res) => {
+  cartoonScraper();
+});
 
-module.exports = cartoonScraper;
+module.exports = server;
