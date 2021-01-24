@@ -1,11 +1,9 @@
 const puppeteer = require("puppeteer");
-const uuid = require("uuid");
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const schedule = require("node-schedule");
 const cloudinary = require("cloudinary");
+const express = require("express");
 require("dotenv").config();
+
+const server = express();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,43 +13,30 @@ cloudinary.config({
 
 const url = "https://www.newyorker.com/cartoons/random";
 
-const server = express();
-
-// server.use(
-//   cors({
-//     origin: "*",
-//     methods: "GET",
-//     allowedHeaders: "Content-Type",
-//   })
-// );
-
-// server.get("/api", (req, res) => {
-//   console.log("heyyyyy");
-//   res.send({ hey: "yo" });
-// });
-
-// schedule.scheduleJob("23 * * *", function () {
-//   scraper();
-// });
-
-function uploadScreenshot(path) {
-  // return new Promise((resolve, reject) => {
-  const uploadOptions = {};
+const uploadScreenshot = (path) => {
+  const b64 = `data:image/png;base64,${path}`;
 
   const uploadPreset = {
-    tags: "my_favorite_pizza",
+    tags: "New Yorker",
+    folder: "doodles",
   };
-  cloudinary.v2.uploader.upload(path, uploadPreset, function (err, image) {
-    if (err) {
-      console.warn(err);
-    } else {
-      console.log(image);
-    }
-  });
-}
-// }
 
-(async () => {
+  const response = cloudinary.v2.uploader.upload(
+    b64,
+    uploadPreset,
+    function (err, image) {
+      if (err) {
+        console.warn(err);
+      } else {
+        console.log(image);
+      }
+    }
+  );
+
+  return response;
+};
+
+const cartoonScraper = async () => {
   const browser = await puppeteer.launch({
     headless: true, // Set to false while development
     defaultViewport: null,
@@ -63,33 +48,30 @@ function uploadScreenshot(path) {
   });
   try {
     const page = await browser.newPage();
-
     await page.goto(url, {
       waitUntil: "networkidle2",
     });
-
     await page.click("body");
-
     await page.waitForTimeout(10000);
 
     const doodle = await page.$("#cartoon.vertical-center");
-    const img = await page.$("#cartoonimg");
-
-    const doodleName = uuid.v4();
-    const location = `./assets/${doodleName}.png`;
     const screenshot = await doodle.screenshot({
-      path: location,
+      encoding: "base64",
       omitBackground: true,
     });
 
-    if (location) {
-      return uploadScreenshot(location);
+    if (screenshot) {
+      return uploadScreenshot(screenshot);
     }
   } catch (error) {
     console.log(error);
   }
 
   await browser.close();
-})();
+};
+
+server.get("/api", (req, res) => {
+  cartoonScraper();
+});
 
 module.exports = server;
