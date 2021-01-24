@@ -35,13 +35,14 @@ const server = express();
 // });
 
 function uploadScreenshot(path) {
-  // return new Promise((resolve, reject) => {
-  const uploadOptions = {};
+  const b64 = `data:image/png;base64,${path}`;
 
   const uploadPreset = {
-    tags: "my_favorite_pizza",
+    tags: "New Yorker",
+    folder: "doodles",
   };
-  cloudinary.v2.uploader.upload(path, uploadPreset, function (err, image) {
+
+  cloudinary.v2.uploader.upload(b64, uploadPreset, function (err, image) {
     if (err) {
       console.warn(err);
     } else {
@@ -49,7 +50,6 @@ function uploadScreenshot(path) {
     }
   });
 }
-// }
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -78,12 +78,12 @@ function uploadScreenshot(path) {
     const doodleName = uuid.v4();
     const location = `./assets/${doodleName}.png`;
     const screenshot = await doodle.screenshot({
-      path: location,
+      encoding: "base64",
       omitBackground: true,
     });
 
-    if (location) {
-      return uploadScreenshot(location);
+    if (screenshot) {
+      return uploadScreenshot(screenshot);
     }
   } catch (error) {
     console.log(error);
