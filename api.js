@@ -73,6 +73,7 @@ const cartoonScraper = async () => {
 
 server.get("/api", (req, res) => {
   const img = cartoonScraper();
+  console.log(img, "img");
   res.send({ note: "Done!" });
 });
 
