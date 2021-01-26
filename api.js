@@ -44,8 +44,7 @@ const cartoonScraper = async () => {
       "--no-sandbox",
       "--incognito",
       "--start-maximized",
-      "--single-process",
-      "--disable-gpu", // Start in maximized state
+      "--disable-setuid-sandbox",
     ],
   });
   try {
