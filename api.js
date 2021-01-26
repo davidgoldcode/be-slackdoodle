@@ -43,7 +43,9 @@ const cartoonScraper = async () => {
     args: [
       "--no-sandbox",
       "--incognito",
-      "--start-maximized", // Start in maximized state
+      "--start-maximized",
+      "--single-process",
+      "--disable-gpu", // Start in maximized state
     ],
   });
   try {
@@ -71,7 +73,8 @@ const cartoonScraper = async () => {
 };
 
 server.get("/api", (req, res) => {
-  cartoonScraper();
+  const img = cartoonScraper();
+  res.send({ note: "Done!" });
 });
 
 module.exports = server;
